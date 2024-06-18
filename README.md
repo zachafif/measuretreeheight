@@ -1,5 +1,5 @@
 # Tree Height Measurement using LiDAR
-Trial on how to measure tree height from LiDAR data using R
+Trial on how to measure tree height from LiDAR data
 
 ## Background
 
@@ -7,7 +7,7 @@ One of the most common remote sensing applications in agriculture and forestry f
 
 ## Objective
 
-Conduct a tree height measurement on the LiDAR dataset using R (lidR packages).
+Conduct a tree height measurement on the LiDAR dataset using Individual Tree Method (lidR packages).
 
 
 ## Dataset
