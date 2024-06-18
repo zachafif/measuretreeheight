@@ -1,4 +1,4 @@
-# Tree Height Measurement using LiDAR data and Individual Tree Detection Method,
+# Tree Height Measurement using LiDAR data and Individual Tree Detection Method
 Trial on how to measure tree height from LiDAR data using R
 
 ## Background
