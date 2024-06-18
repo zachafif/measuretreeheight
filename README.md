@@ -1,9 +1,9 @@
-# measuretreeheight
+# Tree Height Measurement using LiDAR data and Individual Tree Detection Method,
 Trial on how to measure tree height from LiDAR data using R
 
 ## Background
 
-One of the most common remote sensing application in agriculture and forestry field is tree height measurement. Several methods and tools can be tried out for tree height measurement. In this case, we will try out the Individual Tree Detection method from LiDAR data. 
+One of the most common remote sensing applications in agriculture and forestry field is tree height measurement. Several methods and tools can be tried out for tree height measurement. In this case, the Individual Tree Detection method from LiDAR data will be carried out. 
 
 ## Objective
 
@@ -17,10 +17,10 @@ NEON (National Ecological Observatory Network). Discrete return LiDAR point clou
 
 ## Method
 
-The LiDAR point cloud first need to be classified as ground and non-ground point. Then the data will be normalized, this process is the same as the canopy height model (raster) for those more familiar with the term.
-After that, we can apply the local maximum filter (LMF) algorithm to the dataset. The algorithm works by looking on the highest (maxima) on neighboring points in a circle of a certain radius (window size). 
+The LiDAR point cloud first need to be classified as ground and non-ground point. Then the data will be normalized, this process is the same as the canopy height model (raster) for those who are more familiar with the term.
+After that, the local maximum filter (LMF) algorithm applied to the dataset. The algorithm works by looking on the highest (maxima) on neighboring points in a circle of a certain radius (window size). 
 
-The method I will be using is shown in this picture,
+The workflow the will be carried out shown in this picture,
 
 ![diagram case 1](https://github.com/zachafif/measuretreeheight/assets/103014717/1f1cf7a2-ac83-4d20-986f-679f94f06c50)
 
@@ -28,7 +28,7 @@ The method I will be using is shown in this picture,
 
 ## Result:
 
-First we will import the library needed,
+First, import the library needed.
 
 ```
 library(lidR)
@@ -37,18 +37,20 @@ library(sf)
 library(raster)
 
 ```
-Next we will load the LiDAR point cloud,
+Next, load the LiDAR point cloud.
 
 ```
 #Load Data
 
-input<-"H:/AfifBelajar/R/NEON_lidar-point-cloud-line/NEON_lidar-point-cloud-line/NEON.D16.ABBY.DP1.30003.001.2017-06.basic.20240612T130227Z.RELEASE-2024/NEON_D16_ABBY_DP1_553000_5062000_classified_point_cloud_colorized.laz"
+input<-"inputdirectory/NEON_D16_ABBY_DP1_553000_5062000_classified_point_cloud_colorized.laz"
+
+output<-"outputdirectory"
 
 las<-readALSLAS(input)
 
 ```
 
-Next, we do initial checking,
+Next, Do an initial checking,
 
 ```
 > print(las)
@@ -62,9 +64,9 @@ density      : 9.67 points/m²
 density      : 5.05 pulses/m
 
 ```
-Here we got that the CRS are in WGS 84 / UTM zone 10N  with a point density of 9.67 points/m² which is quite good. Additionaly we have a 4 return in this data.
+Here it is stated that the CRS is in WGS 84 / UTM zone 10N  with a point density of 9.67 points/m² which is quite good.
 
-Then we do more advanced checking to see if the data is valid,
+Then more advanced checking were done to see if the data is valid,
 
 ```
 > las_check(las)
@@ -118,9 +120,9 @@ Then we do more advanced checking to see if the data is valid,
 
 ```
 
-We can see that the data is already classified as ground and non-ground (done by the data provider) which will skip one step. There are some data duplicates but we will keep it for now.
+From above console message, The data is already classified as ground and non-ground (done by the data provider) which will skip one step. There are some data duplicates but for now it will be kept.
 
-Next we will do data normalization,
+Next is data normalization. The process that being done to normalize LiDAR elevation data relative to ground points.
 
 ```
 #normalized Data
@@ -130,9 +132,9 @@ nlas<- nlas[nlas$Z<40]
 
 ```
 
-I add the last line because the result of normalization has an outlier (which is because we do not do any noise filter), therefore we try to filter the data with a limit no more than 40 meter above ground.
+The last line was added because the result of normalization has an outlier (which is because no noise filter were done), therefore the data will be filtered with a limit of no more than 40 meters above the ground.
 
-Next we do the Individual tree detection both using point cloud based processed and raster based processed. For point cloud based processed it is as simple as the following code,
+Next the Individual tree detection can be done both using point cloud based processes and raster based processes. For point cloud-based process, it is as simple as the following code,
 
 ```
 
@@ -142,7 +144,7 @@ ttops <- locate_trees(nlas, lmf(ws = 5))
 
 ```
 
-As for raster based processed, we need to generate canopy height model first which come from differencing a digital surface model and digital terrain model,
+As for raster-based process, It was needed to generate a canopy height model first which came from differencing a digital surface model and a digital terrain model,
 
 ```
 
@@ -154,61 +156,65 @@ dsm <- rasterize_canopy(class_las)
 
 chm<-dsm-dtm
 
-writeRaster(chm,"H:/AfifBelajar/R/NEON_lidar-point-cloud-line/NEON_lidar-point-cloud-line/chm.Tif",overwrite=TRUE) #export the CHM
+writeRaster(chm,paste0(output,"/chm.Tif",overwrite=TRUE)) #line to export the CHM
 
-ttops <- locate_trees(chm, lmf(ws = 5))
+tree_pts <- locate_trees(chm, lmf(ws = 5))
 
 ```
 
-After the process is done, we can plot the tree points results using this following code,
+After the process were done, the tree points can be plotted.
 
 ```
 #Plot the results
 
 x <- plot(nlas, color="RGB",bg = "white", size = 1)
 
-add_treetops3d(x, ttops)
+add_treetops3d(x, tree_pts)
 
 ```
 Here is the result on overview,
 ![NEON_D16_ABBY_DP1_553000_5062000_classified_point_cloud_colorized](https://github.com/zachafif/measuretreeheight/assets/103014717/aa9ed6ae-3bc2-463b-b118-824ef32b2c2d)
 
 
-We can export the tree points into a shapefile,
+The tree points can be exported into a shapefile. ST_SF() is added to convert tree points into an SF object and ST_ZM is added to convert 3D points into 2D points.
 
 ```
 #Export to SHP
 
-ttops_sf<-st_sf(ttops)
+tree_pts_sf<-st_sf(tree_pts)
 
-ttops_sf<-st_zm(ttops_sf)
+tree_pts_sf<-st_zm(tree_pts_sf)
 
-st_write(ttops_sf, "H:/AfifBelajar/R/NEON_lidar-point-cloud-line/NEON_lidar-point-cloud-line/ttops.shp")
+st_write(tree_pts_sf, paste0(output,"/tree_pts.shp")) #line to export the SHP
 
 ```
 
 Here is the tree point result loaded in QGIS overlayed on top of the CHM,
 ![image](https://github.com/zachafif/measuretreeheight/assets/103014717/7a6a8742-b340-442b-a5ae-b998fc950a59)
 
-Also We can export the tree points into a CSV file with coordinates,
+Also,  tree points can be exported into a CSV file with coordinates. The coordinates need to be extracted first before then being added to the table.
 
 ```
 #Export to CSV
 
-ttops_df<-as.data.frame(ttops_sf)
+tree_pts_df<-as.data.frame(tree_pts_sf)
 
-coordinates<-as.data.frame(st_coordinates(ttops$geometry))
+coordinates<-as.data.frame(st_coordinates(tree_pts$geometry))
 
-ttops_df$X<-coordinates$X
+tree_pts_df$X<-coordinates$X
 
-ttops_df$Y<-coordinates$Y
+tree_pts_df$Y<-coordinates$Y
 
-ttops_df<-ttops_df[,c(1,4,5,2)]
+tree_pts_df<-tree_pts_df[,c(1,4,5,2)]
 
-write.csv(ttops_df,"H:/AfifBelajar/R/NEON_lidar-point-cloud-line/NEON_lidar-point-cloud-line/ttops.csv")
+write.csv(tree_pts_df,paste0(output,"/tree_pts.csv")) #line to export the CSV
 
 ```
 
 The result will be as follows,
 
 ![image](https://github.com/zachafif/measuretreeheight/assets/103014717/024efc71-c673-454a-93f5-2d2df249161f)
+
+## Conclusion:
+
+Tree height measurement can be done using the combination of LiDAR sensor and individual tree detection method. The process also become very convinient using lidR package with only a few lines of codes. However, the tree points results are not perfect, thus it need manual checking and editing in order to have a good result.
