@@ -140,7 +140,7 @@ Next the Individual tree detection can be done both using point cloud based proc
 
 #Individual Tree Detection (point based)
 
-ttops <- locate_trees(nlas, lmf(ws = 5))
+tree_pts <- locate_trees(nlas, lmf(ws = 5))
 
 ```
 
