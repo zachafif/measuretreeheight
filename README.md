@@ -1,6 +1,9 @@
 # Tree Height Measurement using LiDAR
 Trial on how to measure tree height from LiDAR data
 
+![gifmaker_me](https://github.com/zachafif/measuretreeheight/assets/103014717/d5cd5595-6d83-4dfe-8b51-0e19126ac44a)
+
+
 ## Background
 
 One of the most common remote sensing applications in agriculture and forestry field is tree height measurement. Several methods and tools can be tried out for tree height measurement. In this case, the Individual Tree Detection method from LiDAR data will be carried out. 
