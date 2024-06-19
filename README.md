@@ -218,9 +218,11 @@ The result will be as follows,
 
 ![image](https://github.com/zachafif/measuretreeheight/assets/103014717/024efc71-c673-454a-93f5-2d2df249161f)
 
+The Z column in the table both in SHP and CSV is the tree height information. The information is available per tree points with a treeID as it identifier.
+
 ## Conclusion:
 
-Tree height measurement can be done using the combination of LiDAR sensor and individual tree detection method. The process also become very convinient using lidR package with only a few lines of codes. However, the tree points results are not perfect, thus it need manual checking and editing in order to have a good result.
+Tree height measurement can be done using the combination of LiDAR sensor and individual tree detection method. The process also become very convenient using lidR package with only a few lines of code and can result in detailed information as the height values are available for all tree points. However, the tree points results are not perfect, thus it need manual checking and editing in order to have a good result.
 
 # Reference:
 
